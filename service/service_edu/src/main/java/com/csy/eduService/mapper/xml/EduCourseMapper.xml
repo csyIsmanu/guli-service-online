@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csy.eduService.mapper.EduCourseMapper">
+    <!--根据课程id查询课程确认信息-->
+    <select id="getPublishCourseInfo" resultType="com.csy.eduService.entity.vo.CoursePublishVo">
+        SELECT
+        c.id,
+        c.title,
+        c.price,
+        c.cover,
+        c.lesson_num AS lessonNum,
+        CONVERT(c.price, DECIMAL(8,2)) AS price,
+        s1.title AS subjectLevelOne,
+        s2.title AS subjectLevelTwo,
+        ecd.description As description,
+        t.name AS teacherName
+    FROM
+        edu_course c
+        LEFT JOIN edu_course_description ecd ON c.id = ecd.id
+        LEFT JOIN edu_teacher t ON c.teacher_id = t.id
+        LEFT JOIN edu_subject s1 ON c.subject_parent_id = s1.id
+        LEFT JOIN edu_subject s2 ON c.subject_id = s2.id
+    WHERE
+        c.id = #{courseId}
+    </select>
+
+    <!--Front根据课程id查询课程确认信息-->
+    <select id="getBaseCourseInfo" resultType="com.csy.eduService.entity.frontvo.CourseWebVo">
+        SELECT
+        c.id,
+        c.title,
+        c.price,
+        c.cover,
+        c.lesson_num AS lessonNum,
+        c.buy_count AS buyCount,
+        c.view_count AS viewCount,
+        CONVERT(c.price, DECIMAL(8,2)) AS price,
+        s1.id AS subjectLevelOneId,
+        s1.title AS subjectLevelOne,
+        s2.id AS subjectLevelTwoId,
+        s2.title AS subjectLevelTwo,
+        ecd.description As description,
+        t.name AS teacherName,
+        t.id AS teacherId,
+        t.intro,
+        t.avatar
+        FROM
+        edu_course c
+        LEFT JOIN edu_course_description ecd ON c.id = ecd.id
+        LEFT JOIN edu_teacher t ON c.teacher_id = t.id
+        LEFT JOIN edu_subject s1 ON c.subject_parent_id = s1.id
+        LEFT JOIN edu_subject s2 ON c.subject_id = s2.id
+        WHERE
+        c.id = #{courseId}
+    </select>
+
+    <!--查询每日新增课程数-->
+    <select id="countCourseDay" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM edu_course ec
+        WHERE DATE(ec.gmt_create)=#{day}
+    </select>
+
+</mapper>
